@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.auth.entity.UserInfo;
 import com.auth.service.UserInfoService;
+import com.auth.utilities.AuthRequest;
 import com.auth.utilities.AuthResponse;
 import com.auth.utilities.JwtService;
 
@@ -37,10 +38,10 @@ public class AuthController {
 	}
 	
 	@PostMapping("/login")
-	ResponseEntity<AuthResponse> login(@RequestBody UserInfo userInfo) {
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userInfo.getUsername(), userInfo.getPassword()));
+	ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
-        	final String token = jwtService.generateToken(userInfo.getUsername());
+        	final String token = jwtService.generateToken(authRequest.getUsername());
             AuthResponse authResponse = new AuthResponse();
             authResponse.setStatus(true);
             authResponse.setToken(token);
