@@ -15,30 +15,33 @@ import com.auth.utilities.JwtService;
 
 @Service
 public class AuthService {
-	@Autowired private JwtService jwtService;
-	@Autowired private UserInfoRepository userInfoRepository;
-	@Autowired private AuthenticationManager authenticationManager;
-	
+	@Autowired
+	private JwtService jwtService;
+	@Autowired
+	private UserInfoRepository userInfoRepository;
+	@Autowired
+	private AuthenticationManager authenticationManager;
+
 	public AuthResponse signupUser(UserInfo userInfo) {
 		userInfoRepository.save(userInfo);
 		final String token = jwtService.generateToken(userInfo.getUsername());
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setStatus(true);
-        authResponse.setToken(token);
-        return authResponse;
+		AuthResponse authResponse = new AuthResponse();
+		authResponse.setStatus(true);
+		authResponse.setToken(token);
+		return authResponse;
 	}
-	
+
 	public AuthResponse loginUser(AuthRequest authRequest) {
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-        if (authentication.isAuthenticated()) {
-        	final String token = jwtService.generateToken(authRequest.getUsername());
-            AuthResponse authResponse = new AuthResponse();
-            authResponse.setStatus(true);
-            authResponse.setToken(token);
-            return authResponse;
-        }
-        else {
-        	throw new UsernameNotFoundException("invalid user request !");
-        }
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+		if (authentication.isAuthenticated()) {
+			final String token = jwtService.generateToken(authRequest.getUsername());
+			AuthResponse authResponse = new AuthResponse();
+			authResponse.setStatus(true);
+			authResponse.setToken(token);
+			return authResponse;
+		} else {
+			throw new UsernameNotFoundException("invalid user request !");
+		}
 	}
 }

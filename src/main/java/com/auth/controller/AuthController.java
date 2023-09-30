@@ -1,6 +1,5 @@
 package com.auth.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +13,19 @@ import com.auth.service.AuthService;
 import com.auth.utilities.AuthRequest;
 import com.auth.utilities.AuthResponse;
 
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-	@Autowired private AuthService authService;
+	@Autowired
+	private AuthService authService;
+
 	@PostMapping("/signup")
 	ResponseEntity<AuthResponse> signup(@RequestBody UserInfo userInfo) {
-        return new ResponseEntity<AuthResponse>(authService.signupUser(userInfo), HttpStatus.OK);
+		return new ResponseEntity<AuthResponse>(authService.signupUser(userInfo), HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/login")
 	ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
-		
-            return new ResponseEntity<AuthResponse>(authService.loginUser(authRequest), HttpStatus.OK);
-        
+		return new ResponseEntity<AuthResponse>(authService.loginUser(authRequest), HttpStatus.OK);
 	}
-	
 }
