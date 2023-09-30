@@ -1,12 +1,9 @@
 package com.auth.controller;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,29 +15,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.auth.entity.UserInfo;
 import com.auth.service.UserInfoService;
+import com.auth.utilities.AuthResponse;
 import com.auth.utilities.JwtService;
 
 
 @RestController
 @RequestMapping("/api/auth")
-public class UserController {
+public class AuthController {
 	@Autowired private UserInfoService userInfoService; 
 	@Autowired private AuthenticationManager authenticationManager;
 	@Autowired private JwtService jwtService;
-	
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	@PostMapping("/signup")
-	ResponseEntity<String> addAUser(@RequestBody UserInfo userInfo) {
-		logger.info("register in process");
-		return new ResponseEntity<String>(userInfoService.addAUser(userInfo), HttpStatus.CREATED);
+	ResponseEntity<AuthResponse> signup(@RequestBody UserInfo userInfo) {
+		userInfoService.addAUser(userInfo);
+		final String token = jwtService.generateToken(userInfo.getUsername());
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setStatus(true);
+        authResponse.setToken(token);
+        return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
+		
 	}
 	
 	@PostMapping("/login")
-	ResponseEntity<String> login(@RequestBody UserInfo userInfo) {
-		logger.info("Logging in process");
+	ResponseEntity<AuthResponse> login(@RequestBody UserInfo userInfo) {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userInfo.getUsername(), userInfo.getPassword()));
         if (authentication.isAuthenticated()) {
-            return ResponseEntity.ok(jwtService.generateToken(userInfo.getUsername()));
+        	final String token = jwtService.generateToken(userInfo.getUsername());
+            AuthResponse authResponse = new AuthResponse();
+            authResponse.setStatus(true);
+            authResponse.setToken(token);
+            return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
         } else {
             throw new UsernameNotFoundException("invalid user request !");
         }
