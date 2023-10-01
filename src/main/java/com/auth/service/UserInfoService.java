@@ -1,5 +1,7 @@
 package com.auth.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,5 +23,9 @@ public class UserInfoService implements UserDetailsService {
 		UserInfo userInfo = userInfoRepository.findById(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 		return new UserInfoDetails(userInfo);
+	}
+
+	public List<UserInfo> getAllUsers() {
+		return userInfoRepository.findAll();
 	}
 }
